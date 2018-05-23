@@ -1,14 +1,17 @@
-require('electron-reload')(__dirname)
+const isDev = require('electron-is-dev');
+
+if (isDev) {
+    require('electron-reload')(__dirname);
+}
+
 const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron')
 const path = require('path')
 const url = require('url')
-
 
 const menu = Menu.buildFromTemplate([
     {
         label: 'Menu',
         submenu: [
-            {},
             { label: 'Adjust Notification Value' },
             {
                 label: 'CoinMarketCap',
@@ -50,7 +53,9 @@ function createWindow() {
     }))
 
     // Open the DevTools.
-    win.webContents.openDevTools();
+    if (isDev) {
+        win.webContents.openDevTools();
+    }
 
     // Emitted when the window is closed.
     win.on('closed', () => {
