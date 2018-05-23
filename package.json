@@ -24,7 +24,7 @@
     "publish": [
       {
         "provider": "generic",
-        "url": "http://localhost:5000/electronupdate/"
+        "url": "http://localhost:3001/electronupdate/"
       }
     ],
     "win": {
@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "electron-is-dev": "^0.3.0"
+    "electron-is-dev": "^0.3.0",
+    "electron-updater": "^2.21.10"
   }
 }

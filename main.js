@@ -7,6 +7,7 @@ if (isDev) {
 const { app, BrowserWindow, Menu, shell, ipcMain } = require('electron')
 const path = require('path')
 const url = require('url')
+const { autoUpdater } = require("electron-updater");
 
 const menu = Menu.buildFromTemplate([
     {
@@ -35,6 +36,55 @@ const menu = Menu.buildFromTemplate([
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
+
+function autoUpdateEvents() {
+    /* autoUpdater.on('checking-for-update', () => {
+      console.log('Checking for update...');
+    })
+    autoUpdater.on('update-available', (ev, info) => {
+      console.log('Update available.');
+    }) */
+
+    autoUpdater.on('update-not-available', (ev, info) => {
+        console.log(update - not - available);
+        setTimeout(function () { autoUpdater.checkForUpdates(); }, 60000 * 60 * 1); // 2hr
+    })
+
+    autoUpdater.on('error', (ev, err) => {
+        console.log("In Error");
+        setTimeout(function () { autoUpdater.checkForUpdates(); }, 60000 * 60 * 1); // 2hr
+    })
+
+    autoUpdater.on('download-progress', (ev, progressObj) => {
+        console.log('Download progress...');
+    })
+
+    autoUpdater.on('update-downloaded', async (event, releaseNotes, releaseName) => {
+        let currentVersion = parseInt(event.version.substring(event.version.lastIndexOf('.') + 1, 1000));
+        if (currentVersion === 0 || currentVersion % 2 === 0) {
+            autoUpdater.quitAndInstall()
+        } else {
+            let message = app.getName() + ' ' + event.version + ' is now available. It will be installed the next time you restart the application.';
+
+            // Ask user to update the app
+            dialog.showMessageBox({
+                type: 'question',
+                buttons: ['Install', 'Later'],
+                defaultId: 0,
+                message: 'A new version of ' + app.getName() + ' has been downloaded',
+                detail: message
+            }, (response) => {
+                if (response === 0) {
+                    setTimeout(() => autoUpdater.quitAndInstall(), 1);
+                }
+            });
+
+        }
+
+    });
+
+    setTimeout(function () { autoUpdater.checkForUpdates(); }, 1000 * 10); // 10 sec
+}
 
 function createWindow() {
     // Create the browser window.
@@ -67,6 +117,10 @@ function createWindow() {
     })
 
     Menu.setApplicationMenu(menu);
+
+    if (!isDev) {
+        autoUpdateEvents();
+    }
 }
 
 // This method will be called when Electron has finished
